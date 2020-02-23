@@ -10,6 +10,7 @@ counter = 0
 
 async def response(websocket, path):
     msg = json.loads(await websocket.recv())
+    print(msg)
     name = msg["name"]
     if name not in players:
         players[name] = 20
