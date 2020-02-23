@@ -39,7 +39,7 @@ def tap(player):
     taps_until_prize = 10 - counter % 10
 
     return {
-        "type" : "tapResult",
+        "action" : "tapResult",
         "prize" : prize,
         "newScore" : players[player],
         "tapsUntilPrize" : taps_until_prize
