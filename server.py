@@ -76,5 +76,5 @@ host = "0.0.0.0"
 print("Starting server on port", port)
 start_server = websockets.serve(respond, host, port)
 
-asyncio.get_event_loop().run
+asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
