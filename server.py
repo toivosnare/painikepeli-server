@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# WS server example
-
 import asyncio
 import websockets
 
@@ -14,7 +12,10 @@ async def hello(websocket, path):
     await websocket.send(greeting)
     print(f"> {greeting}")
 
-start_server = websockets.serve(hello, "localhost", 45620)
+port = 45620
+host = "localhost"
+print("Starting server on port", port)
+start_server = websockets.serve(hello, host, port)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
