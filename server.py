@@ -14,7 +14,9 @@ async def response(websocket, path):
     name = msg["name"]
     if name not in players:
         players[name] = 20
-    websocket.send(str(players[name]))
+    score = str(players[name])
+    print(score)
+    websocket.send(score)
     
 
 port = os.environ['PORT']
