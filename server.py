@@ -46,29 +46,29 @@ def tap(player):
     }
 
 async def respond(websocket, path):
-    msg = json.loads(await websocket.recv())
-    print(msg)
-    try:
-        action = msg["action"]
-        player = msg["player"]
-    except KeyError:
-        print("Invalid message: ", msg)
-        return
+    async for msg in websocket:
+        print(msg)
+        try:
+            action = msg["action"]
+            player = msg["player"]
+        except KeyError:
+            print("Invalid message: ", msg)
+            return
 
-    if action == "join":
-        join(player)
-        response = get_score(player)
-    elif action == "tap":
-        response = tap(player)
-    elif action == "reset":
-        reset(player)
-        response = get_score(player)
-    else:
-        print("Invalid message: ", msg)
-        return
-    
-    print("Sending response: ", response)
-    await websocket.send(json.dumps(response))
+        if action == "join":
+            join(player)
+            response = get_score(player)
+        elif action == "tap":
+            response = tap(player)
+        elif action == "reset":
+            reset(player)
+            response = get_score(player)
+        else:
+            print("Invalid message: ", msg)
+            return
+        
+        print("Sending response: ", response)
+        await websocket.send(json.dumps(response))
     
 
 port = os.environ['PORT']
@@ -76,5 +76,5 @@ host = "0.0.0.0"
 print("Starting server on port", port)
 start_server = websockets.serve(respond, host, port)
 
-asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run
 asyncio.get_event_loop().run_forever()
