@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import asyncio
 import websockets
 
@@ -12,7 +13,7 @@ async def hello(websocket, path):
     await websocket.send(greeting)
     print(f"> {greeting}")
 
-port = 45620
+port = os.environ['PORT']
 host = "localhost"
 print("Starting server on port", port)
 start_server = websockets.serve(hello, host, port)
