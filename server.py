@@ -47,6 +47,7 @@ def tap(player):
 
 async def respond(websocket, path):
     msg = json.loads(await websocket.recv())
+    print(msg)
     try:
         action = msg["action"]
         player = msg["player"]
