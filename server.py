@@ -14,7 +14,7 @@ async def hello(websocket, path):
     print(f"> {greeting}")
 
 port = os.environ['PORT']
-host = "localhost"
+host = "0.0.0.0"
 print("Starting server on port", port)
 start_server = websockets.serve(hello, host, port)
 
