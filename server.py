@@ -16,7 +16,7 @@ async def response(websocket, path):
         players[name] = 20
     score = str(players[name])
     print(score)
-    websocket.send(score)
+    await websocket.send(score)
     
 
 port = os.environ['PORT']
