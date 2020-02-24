@@ -4,6 +4,7 @@ import os
 import asyncio
 import websockets
 import json
+import signal
 
 INITIAL_SCORE = 20
 players = {}
@@ -47,13 +48,12 @@ def tap(player):
 
 async def respond(websocket, path):
     async for message in websocket:
-        print(message)
-        msg = json.loads(message)
+        message = json.loads(message)
         try:
-            action = msg["action"]
-            player = msg["player"]
+            action = message["action"]
+            player = message["player"]
         except KeyError:
-            print("Invalid message: ", msg)
+            print("Invalid message: ", message)
             return
 
         if action == "join":
@@ -65,17 +65,21 @@ async def respond(websocket, path):
             reset(player)
             response = get_score(player)
         else:
-            print("Invalid message: ", msg)
+            print("Invalid message: ", message)
             return
-        
-        print("Sending response: ", response)
+
+        print(">", message)
+        print("<", response)
         await websocket.send(json.dumps(response))
     
+async def game_server(stop):
+    host = "0.0.0.0"
+    port = os.environ['PORT']
+    print("Starting server on port", port)
+    async with websockets.serve(respond, host, port):
+        await stop
 
-port = os.environ['PORT']
-host = "0.0.0.0"
-print("Starting server on port", port)
-start_server = websockets.serve(respond, host, port)
-
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+loop = asyncio.get_event_loop()
+stop = loop.create_future()
+loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+loop.run_until_complete(game_server(stop))
