@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+# Basic server that keep track of players scores and mediates
+# the information to clients via websockets. Transfered data
+# is formatted in simple json format. No real user authentication
+# is performed by the server for now (other than the player name
+# identifier attached to all messages).
+
 import os
 import asyncio
 import websockets
@@ -7,7 +13,7 @@ import json
 import signal
 
 INITIAL_SCORE = 20
-players = {}
+players = {} # Dictionary with player names as keys and their scores as values
 counter = 0
 
 def get_score(player):
@@ -17,7 +23,6 @@ def get_score(player):
     }
 
 def reset(player):
-    print(f"Reseting {player}'s score to {INITIAL_SCORE}")
     players[player] = INITIAL_SCORE
     
 def join(player):
@@ -49,7 +54,7 @@ def tap(player):
 async def respond(websocket, path):
     try:
         async for message in websocket:
-            message = json.loads(message)
+            message = json.loads(message) # Decode json string to a dict object
             try:
                 action = message["action"]
                 player = message["player"]
@@ -71,18 +76,17 @@ async def respond(websocket, path):
             print(">", message)
             print("<", response)
             await websocket.send(json.dumps(response))
-    except websockets.exceptions.ConnectionClosed:
-        print(websocket, "closed")
+    except websockets.exceptions.ConnectionClosed: # If connection closes abruptly
         return
     
 async def game_server(stop):
     host = "0.0.0.0"
-    port = os.environ['PORT']
+    port = os.environ["PORT"] # Get the port reserved by Heroku from environment variables
     print("Starting server on port", port)
     async with websockets.serve(respond, host, port):
         await stop
 
 loop = asyncio.get_event_loop()
 stop = loop.create_future()
-loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+loop.add_signal_handler(signal.SIGTERM, stop.set_result, None) # To shutdown gracefully on sigterm signal 
 loop.run_until_complete(game_server(stop))
