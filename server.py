@@ -47,30 +47,33 @@ def tap(player):
     }
 
 async def respond(websocket, path):
-    async for message in websocket:
-        message = json.loads(message)
-        try:
-            action = message["action"]
-            player = message["player"]
-        except KeyError:
-            print("Invalid message: ", message)
-            return
+    try:
+        async for message in websocket:
+            message = json.loads(message)
+            try:
+                action = message["action"]
+                player = message["player"]
+            except KeyError:
+                print("Invalid message: ", message)
+                return
 
-        if action == "join":
-            join(player)
-            response = get_score(player)
-        elif action == "tap":
-            response = tap(player)
-        elif action == "reset":
-            reset(player)
-            response = get_score(player)
-        else:
-            print("Invalid message: ", message)
-            return
-
-        print(">", message)
-        print("<", response)
-        await websocket.send(json.dumps(response))
+            if action == "join":
+                join(player)
+                response = get_score(player)
+            elif action == "tap":
+                response = tap(player)
+            elif action == "reset":
+                reset(player)
+                response = get_score(player)
+            else:
+                print("Invalid message: ", message)
+                return
+            print(">", message)
+            print("<", response)
+            await websocket.send(json.dumps(response))
+    except websockets.exceptions.ConnectionClosed:
+        print(websocket, "closed")
+        return
     
 async def game_server(stop):
     host = "0.0.0.0"
